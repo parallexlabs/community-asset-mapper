@@ -16,7 +16,7 @@ from community_asset_mapper.models.records import InternalRecord
 from community_asset_mapper.resources import resource_path
 from community_asset_mapper.security.sanitize import validate_url
 
-DEFAULT_TILE_URL = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+DEFAULT_TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 OSM_ATTRIBUTION = (
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 )
