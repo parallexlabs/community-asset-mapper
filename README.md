@@ -7,8 +7,8 @@ sont illustratives et non vérifiées; elles ne constituent pas un annuaire actu
 
 A local demonstration toolkit from ParalleX Labs Inc. for importing service
 spreadsheets, checking selected resource fields, reviewing duplicates, producing
-quality backlogs and exporting a static map and table. Version 0.1.0 is an
-unreleased candidate. No client, deployment or certification is asserted.
+quality backlogs and exporting a static map and table. Version 0.1.0 is the first public release (v0.1, showcase MVP). No client,
+deployment or certification is asserted.
 
 ## Open by design
 

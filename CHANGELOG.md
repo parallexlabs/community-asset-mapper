@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 - Unreleased
+## 0.1.0 - 2026-10-11
 
 - Local CSV, Excel and hospital-field adapters with fixture-based demo.
 - Selected HSDS 3.0.1 resource validation and JSON exports.
@@ -11,6 +11,6 @@
 - Packaged schemas, fixtures, site assets and data notices for wheel installation.
 - Fixture-only checks and documentation of the tested accessibility scope.
 
-This is a release candidate. No public release or deployment date is asserted.
+This is the first public release (v0.1, showcase MVP). No deployment is asserted.
 Third-party sources and licences are in [DATA.md](DATA.md). Verification commands
 and observed results are recorded in the release-check documents under `docs/`.
