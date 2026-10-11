@@ -1,0 +1,56 @@
+name: Fixture checks
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Acquire pinned wheels
+        run: |
+          python -m pip download --only-binary=:all: -r requirements-dev.txt -d .cam/wheels
+      - name: Install offline
+        run: |
+          python -m pip install --no-index --find-links .cam/wheels -r requirements-dev.txt
+          python -m pip install --no-index --no-build-isolation --no-deps -e .
+      - name: Run fixture checks
+        env:
+          CAM_OFFLINE: "1"
+          PIP_NO_INDEX: "1"
+        run: |
+          export PYTHONPATH="$PWD/scripts/offline"
+          ruff check
+          mypy src
+          pyright
+          pytest --cov
+          cam run-demo
+          cam build-site -o dist/site --no-tiles
+          python -m build --wheel --no-isolation --outdir dist/wheels
+      - name: Install wheel and run packaged demo offline
+        env:
+          CAM_OFFLINE: "1"
+          PIP_NO_INDEX: "1"
+        run: |
+          python -m venv .cam/wheel-env
+          .cam/wheel-env/bin/python -m pip install --no-index --find-links .cam/wheels -r requirements-dev.txt
+          .cam/wheel-env/bin/python -m pip install --no-index --no-deps dist/wheels/*.whl
+          export PYTHONPATH="$PWD/scripts/offline"
+          mkdir -p .cam/wheel-run
+          cd .cam/wheel-run
+          ../wheel-env/bin/cam run-demo
+          ../wheel-env/bin/cam build-site -o site --no-tiles

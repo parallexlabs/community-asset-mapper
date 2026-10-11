@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the project title, version and corporate author."
+title: Community Asset Mapper
+version: 0.1.0
+authors:
+  - name: ParalleX Labs Inc.
+license: Apache-2.0
+keywords:
+  - community-services
+  - hsds
+  - open-referral
+  - gap-analysis
+abstract: >-
+  Python demonstration toolkit for service inventories, selected HSDS resource
+  checks, fixture geocoding, duplicate review, crude population rates, and
+  static map and table generation. Data licences are recorded separately.

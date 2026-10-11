@@ -1,0 +1,11 @@
+{
+  "name": "community-asset-mapper-checks",
+  "private": true,
+  "scripts": {
+    "check:accessibility": "node scripts/check_accessibility.cjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "playwright": "1.64.0"
+  }
+}
