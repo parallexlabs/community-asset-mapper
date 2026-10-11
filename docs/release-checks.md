@@ -55,8 +55,8 @@ site has six files. Each relative filename must exist on both sides and its byte
 must match; no timestamp stripping or result normalization is used.
 
 ```sh
-git clone --no-hardlinks . .release-work/checkout
-cd .release-work/checkout
+git clone --no-hardlinks . .release-work/checkout-final
+cd .release-work/checkout-final
 python3.12 -m venv .venv
 .venv/bin/python -m pip install --no-index --find-links ../wheelhouse -r requirements-dev.txt
 .venv/bin/python -m pip install --no-index --no-build-isolation --no-deps -e .
@@ -66,6 +66,7 @@ export PYTHONPATH="$PWD/scripts/offline"
 ruff check
 mypy src
 pyright
+mkdir -p .cam
 pytest --cov --basetemp=.cam/pytest-replay
 cam run-demo
 cam build-site -o dist --no-tiles
