@@ -1,0 +1,13 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "CSDUID": "5915001", "type": "csd", "name": "Demo Vancouver CSD" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-123.14, 49.22], [-123.06, 49.22], [-123.06, 49.28], [-123.14, 49.28], [-123.14, 49.22]]]
+      }
+    }
+  ]
+}

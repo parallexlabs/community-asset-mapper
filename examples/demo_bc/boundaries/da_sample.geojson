@@ -1,0 +1,37 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "DAUID": "59150001", "type": "da", "name": "Demo DA 1" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-123.14, 49.25], [-123.10, 49.25], [-123.10, 49.28], [-123.14, 49.28], [-123.14, 49.25]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "DAUID": "59150002", "type": "da", "name": "Demo DA 2" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-123.10, 49.25], [-123.06, 49.25], [-123.06, 49.28], [-123.10, 49.28], [-123.10, 49.25]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "DAUID": "59150003", "type": "da", "name": "Demo DA 3" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-123.14, 49.22], [-123.10, 49.22], [-123.10, 49.25], [-123.14, 49.25], [-123.14, 49.22]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "DAUID": "59150004", "type": "da", "name": "Demo DA 4" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-123.10, 49.22], [-123.06, 49.22], [-123.06, 49.25], [-123.10, 49.25], [-123.10, 49.22]]]
+      }
+    }
+  ]
+}

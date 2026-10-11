@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="assets/leaflet.css">
+  <style>
+    :root { --focus: #005fcc; --text: #1a1a1a; --muted: #555; --bg: #fff; --border: #aaa; }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; color: var(--text); background: var(--bg); margin: 0; line-height: 1.5; }
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .skip-link { position: absolute; left: -9999px; top: 0; background: var(--focus); color: #fff; padding: 0.5rem 1rem; z-index: 1000; }
+    .skip-link:focus { left: 0; }
+    header, main, footer { padding: 1rem 1.5rem; }
+    header, footer { border-block: 1px solid var(--border); }
+    nav[aria-label="Filters"] { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; align-items: end; }
+    label { display: flex; flex-direction: column; font-size: 0.9rem; }
+    #map { height: 400px; border: 1px solid var(--border); margin-block: 1rem 1.5rem; background: #e8eef5; }
+    .table-scroll { overflow-x: auto; padding: 4px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid var(--border); padding: 0.5rem; text-align: left; }
+    th { background: #f4f4f4; }
+    button, input, select { font: inherit; }
+    button { min-height: 32px; cursor: pointer; }
+    .badge { display: inline-block; padding: 0.1rem 0.4rem; border: 1px solid var(--border); border-radius: 3px; font-size: 0.85rem; }
+    .badge::before { content: "Type: "; font-weight: bold; }
+    .service-marker { color: #fff; background: #005fcc; border: 2px solid #fff; border-radius: 50%; text-align: center; font: bold 14px/28px system-ui; }
+    #result-count { font-weight: bold; }
+    footer { font-size: 0.85rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#services-table">Skip to services table</a>
+  <header role="banner">
+    <h1>{{ title }}</h1>
+    <p>Community service directory with map and searchable table.</p>
+    <p>Bundled demo records are illustrative and unverified. Confirm services with the provider before use.</p>
+  </header>
+  <main role="main">
+    <nav aria-label="Filters">
+      <label for="filter-city">City
+        <input type="search" id="filter-city" aria-controls="services-table map" placeholder="Filter by city">
+      </label>
+      <label for="filter-type">Service type
+        <select id="filter-type" aria-controls="services-table map">
+          <option value="">All types</option>
+        </select>
+      </label>
+      <p id="result-count" aria-live="polite" role="status">Showing all services</p>
+      <a href="services.csv" download>Download CSV</a>
+    </nav>
+    <section aria-labelledby="map-heading">
+      <h2 id="map-heading">Service map</h2>
+      <p id="map-help">Focus the map and use arrow keys to pan, plus or minus to zoom.
+        Tab to a service marker and press Enter or Space to open its details. Escape closes details.</p>
+      <a href="#services-table">Continue to services table</a>
+      {% if no_tiles %}<p>Map tiles disabled. Service markers remain available offline.</p>{% endif %}
+      <div id="map" class="{% if no_tiles %}no-tiles{% endif %}" role="region"
+           tabindex="0" aria-label="Map of community services" aria-describedby="map-help"></div>
+    </section>
+    <section aria-labelledby="directory-heading">
+      <h2 id="directory-heading">Service directory</h2>
+      <p id="table-scroll-help">On a narrow screen, focus the table scroll area and use Left or Right to scroll.</p>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Service table scroll area" aria-describedby="table-scroll-help">
+      <table id="services-table" tabindex="-1">
+        <caption>List of community services with organization, city, type, and map action</caption>
+        <thead><tr>
+          <th scope="col">Service</th><th scope="col">Organization</th>
+          <th scope="col">City</th><th scope="col">Type</th><th scope="col">Map</th>
+        </tr></thead>
+        <tbody>
+          {% for row in table_rows %}
+          <tr data-city="{{ row.city }}" data-type="{{ row.service_type }}">
+            <td>{{ row.name }}</td><td>{{ row.organization }}</td><td>{{ row.city }}</td>
+            <td><span class="badge">{{ row.service_type }}</span></td>
+            <td>{% if row.lat is not none and row.lon is not none %}
+              <button type="button" data-feature="{{ loop.index0 }}" aria-label="Show {{ row.name }} on map">Show on map</button>
+            {% else %}No coordinates{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      </div>
+    </section>
+  </main>
+  <footer role="contentinfo">
+    <p>Contains information licensed under the Open Government Licence – British Columbia.
+      <a href="data-licences.md">Data sources and licences</a></p>
+    <p>Map library: Leaflet. <a href="assets/LEAFLET_LICENSE.txt">Library licence</a>.</p>
+    {% if not no_tiles %}<p>Map tiles: <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>.</p>{% endif %}
+  </footer>
+  <script src="assets/leaflet.min.js"></script>
+  <script>
+    const features = {{ map_features | tojson }};
+    const noTiles = {{ no_tiles | tojson }};
+    const cityFilter = document.getElementById('filter-city');
+    const typeFilter = document.getElementById('filter-type');
+    const rows = Array.from(document.querySelectorAll('#services-table tbody tr'));
+    let map = null;
+    let markerLayer = null;
+    const markers = new Map();
+    let popupReturnFocus = null;
+    if (typeof L !== 'undefined') {
+      map = L.map('map', {keyboard: true, zoomAnimation: false, fadeAnimation: false});
+      if (!noTiles) {
+        L.tileLayer({{ tile_url | tojson }}, {attribution: {{ tile_attribution | tojson }}}).addTo(map);
+      }
+      markerLayer = L.layerGroup().addTo(map);
+      features.forEach(f => {
+        const marker = L.marker([f.lat, f.lon], {
+          keyboard: true, title: f.name, alt: f.name,
+          icon: L.divIcon({className: 'service-marker', html: String(f.row_index + 1), iconSize: [32, 32]})
+        });
+        const content = document.createElement('div');
+        [f.name, f.organization, f.city].forEach(text => {
+          const line = document.createElement('p');
+          line.textContent = text;
+          content.appendChild(line);
+        });
+        marker.bindPopup(content);
+        marker.on('add', () => {
+          const element = marker.getElement();
+          element.setAttribute('aria-label', f.name);
+          element.addEventListener('focus', () => marker.setZIndexOffset(1000));
+          element.addEventListener('blur', () => marker.setZIndexOffset(0));
+          element.addEventListener('keydown', event => {
+            if (event.key === ' ' || event.key === 'Enter') {
+              event.preventDefault();
+              marker.openPopup();
+            }
+          });
+        });
+        marker.addTo(markerLayer);
+        markers.set(f.row_index, marker);
+      });
+      if (features.length) map.fitBounds(features.map(f => [f.lat, f.lon]), {padding: [30, 30], maxZoom: 13});
+      else map.setView([49.25, -123.12], 10);
+      map.on('popupopen', event => {
+        popupReturnFocus = document.activeElement;
+        const close = event.popup.getElement().querySelector('.leaflet-popup-close-button');
+        if (close) close.focus();
+      });
+      map.on('popupclose', () => {
+        const focused = document.activeElement;
+        if (popupReturnFocus && popupReturnFocus.isConnected &&
+            (focused === document.body || focused.classList.contains('leaflet-popup-close-button'))) {
+          popupReturnFocus.focus();
+        }
+      });
+      document.getElementById('map').addEventListener('keydown', event => {
+        if (event.key === 'Escape') map.closePopup();
+      });
+    }
+    const types = [...new Set(rows.map(r => r.dataset.type).filter(Boolean))].sort();
+    types.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t; opt.textContent = t; typeFilter.appendChild(opt);
+    });
+    function applyFilters() {
+      const city = cityFilter.value.toLowerCase();
+      const type = typeFilter.value;
+      let visible = 0;
+      rows.forEach((row, index) => {
+        const show = (!city || row.dataset.city.toLowerCase().includes(city)) && (!type || row.dataset.type === type);
+        row.hidden = !show;
+        if (show) visible++;
+        const marker = markers.get(index);
+        if (marker && markerLayer) {
+          if (show) markerLayer.addLayer(marker);
+          else markerLayer.removeLayer(marker);
+        }
+      });
+      document.getElementById('result-count').textContent = 'Showing ' + visible + ' services';
+    }
+    rows.forEach(row => {
+      const button = row.querySelector('button');
+      if (button) button.addEventListener('click', () => {
+        const marker = markers.get(Number(button.dataset.feature));
+        if (marker && map) {
+          map.panTo(marker.getLatLng(), {animate: false});
+          marker.openPopup();
+        }
+      });
+    });
+    cityFilter.addEventListener('input', applyFilters);
+    typeFilter.addEventListener('change', applyFilters);
+    applyFilters();
+  </script>
+</body>
+</html>

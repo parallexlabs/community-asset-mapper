@@ -1,0 +1,29 @@
+Community Asset Mapper
+Copyright 2026 ParalleX Labs Inc.
+Original code and synthetic fixture structure: Apache License, Version 2.0.
+https://www.apache.org/licenses/LICENSE-2.0
+
+Hospital information:
+Contains information licensed under the Open Government Licence – British Columbia.
+https://catalogue.data.gov.bc.ca/dataset/hospitals-in-bc
+https://www2.gov.bc.ca/gov/content/data/policy-standards/data-policies/open-data/open-government-licence-bc
+Sample values are illustrative and unverified. No provider endorsement is asserted.
+
+HSDS 3.0.1 schemas:
+Human Services Data Specification: an Open Referral resource (https://openreferral.org/)
+https://github.com/openreferral/specification/tree/v3.0.1/schema
+Creative Commons Attribution-ShareAlike 4.0 International.
+https://creativecommons.org/licenses/by-sa/4.0/
+Unmodified schema subset; full licence in schemas/hsds/LICENSE.
+
+Leaflet 1.9.4: BSD 2-Clause License.
+Copyright (c) 2010-2023, Volodymyr Agafonkin
+Copyright (c) 2010-2011, CloudMade
+All rights reserved.
+https://github.com/Leaflet/Leaflet/blob/v1.9.4/LICENSE
+Full notice, redistribution conditions and disclaimer are retained in
+src/community_asset_mapper/site/assets/LEAFLET_LICENSE.txt and generated sites.
+
+Optional basemap: © OpenStreetMap contributors.
+https://www.openstreetmap.org/copyright
+No tiles are bundled. See DATA.md for the complete data and licence inventory.
