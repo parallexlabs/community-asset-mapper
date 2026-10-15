@@ -12,7 +12,7 @@ Its bundled data are illustrative and unverified. For community service
 organizations, information and referral lines, and municipal staff who keep
 inventories of local services.
 
-![Static map page with service markers beside a filterable table and CSV download link](docs/media/hero.png)
+![Static demo page: city and service type filters, a CSV download link, and the offline service map with ten numbered markers (map tiles off in the offline demo)](docs/media/hero.png)
 
 **[Try it live](https://parallexlabs.github.io/community-asset-mapper/)** (static demo in `docs/`; see [docs/PAGES_TODO.md](docs/PAGES_TODO.md)).
 
