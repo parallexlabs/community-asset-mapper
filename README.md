@@ -5,10 +5,63 @@ de services communautaires, vérifier certains champs HSDS et produire une carte
 avec un tableau consultable. La démonstration fonctionne hors ligne. Les données
 sont illustratives et non vérifiées; elles ne constituent pas un annuaire actuel.
 
-A local demonstration toolkit from ParalleX Labs Inc. for importing service
-spreadsheets, checking selected resource fields, reviewing duplicates, producing
-quality backlogs and exporting a static map and table. Version 0.1.0 is the first public release (v0.1, showcase MVP). No client,
-deployment or certification is asserted.
+Community Asset Mapper, a ParalleX Labs Inc. demonstration, imports hospital-style
+service spreadsheets, checks selected fields against the Open Referral standard,
+flags likely duplicates and builds a map and filterable table that can work offline.
+Its bundled data are illustrative and unverified. For community service
+organizations, information and referral lines, and municipal staff who keep
+inventories of local services.
+
+![Static map page with service markers beside a filterable table and CSV download link](docs/media/hero.png)
+
+**[Try it live](https://parallexlabs.github.io/community-asset-mapper/)** (static demo in `docs/`; see [docs/PAGES_TODO.md](docs/PAGES_TODO.md)).
+
+[![Screen recording preview of the offline map and table demo](docs/media/demo-preview.gif)](https://parallexlabs.github.io/community-asset-mapper/media/demo.mp4)
+
+<video controls poster="docs/media/demo-poster.png" width="700">
+  <source src="https://parallexlabs.github.io/community-asset-mapper/media/demo.mp4" type="video/mp4">
+  <track kind="captions" src="docs/media/demo.en.vtt" srclang="en" label="English" default>
+</video>
+
+| Gap metrics (demo) | Quality rules (demo) |
+| --- | --- |
+| ![Bar chart of service counts and rates per dissemination area from the bundled gap report](docs/media/chart-gap-rates.png) | ![Horizontal bars of quality issue counts by rule from the bundled backlog](docs/media/chart-quality-rules.png) |
+
+![Pipeline diagram from import through static site export](docs/media/diagram-architecture.png)
+
+| Map and table | Filtered view | Map popup |
+| --- | --- | --- |
+| ![Taller capture of the service directory table with CSV download](docs/media/example-table.png) | ![Map and table after filtering services to Vancouver](docs/media/example-filtered.png) | ![Map popup opened for the first listed service](docs/media/example-map-popup.png) |
+
+![Rendered Markdown quality backlog from the demo pipeline run](docs/media/example-quality-backlog.png)
+
+### How it works
+
+1. Import a service spreadsheet (CSV or Excel); hospital-style columns become records, other columns are counted only.
+2. Check records against the bundled HSDS 3.0.1 schema subset, geocode with offline fixtures, and review duplicate groups.
+3. Count services by area with crude rates where population rows exist, write quality issues, and export HSDS, GeoJSON and CSV.
+4. Build a static site with map, filterable table and CSV download (`--no-tiles` keeps the demo offline).
+
+### Architecture
+
+![Pipeline components from ingest through static site](docs/media/diagram-architecture.png)
+
+- CLI commands orchestrate ingest, validation, geocoding, deduplication, gap metrics, quality checks and exports.
+- Bundled JSON schemas, fixtures and Leaflet assets ship inside the wheel for offline replay.
+- `cam build-site` renders `docs/index.html` (or `dist/index.html` locally) from working state.
+
+### Design choices
+
+- Validation covers selected resource fields only, not full HSDS publication conformance.
+- Gap metrics use point-in-polygon counts and crude rates, not travel times or catchments.
+- The table and CSV link work without JavaScript; filtering and map controls require it.
+- `--no-tiles` disables external basemap requests while keeping markers for offline demos.
+
+### Why it matters
+
+Service lists can be checked on selected fields, cleaned and mapped, even offline; the demo needs no sign-in or telemetry.
+
+Showcase screenshots and the demo video are regenerated with `python scripts/make_showcase_media.py` after `cam run-demo` and `cam build-site -o dist --no-tiles`.
 
 ## Open by design
 
