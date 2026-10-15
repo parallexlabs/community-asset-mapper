@@ -14,6 +14,8 @@ inventories of local services.
 
 ![Static demo page: city and service type filters, a CSV download link, and the offline service map with ten numbered markers (map tiles off in the offline demo)](docs/media/hero.png)
 
+How it was made: its code and documentation were written with AI coding assistants and reviewed, tested and revised by Amir Daneshpajouh.
+
 **[Try it live](https://parallexlabs.github.io/community-asset-mapper/)** (static demo in `docs/`; see [docs/PAGES_TODO.md](docs/PAGES_TODO.md)).
 
 [![Screen recording preview of the offline map and table demo](docs/media/demo-preview.gif)](https://parallexlabs.github.io/community-asset-mapper/media/demo.mp4)
