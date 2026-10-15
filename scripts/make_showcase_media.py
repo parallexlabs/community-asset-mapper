@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -12,9 +13,9 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-FFMPEG = "/Users/studio/.homebrew/bin/ffmpeg"
-EXIFTOOL = "/opt/homebrew/bin/exiftool"
+CHROME = os.environ.get("CHROME", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+FFMPEG = os.environ.get("FFMPEG") or shutil.which("ffmpeg") or "ffmpeg"
+EXIFTOOL = os.environ.get("EXIFTOOL") or shutil.which("exiftool") or "exiftool"
 DOCS = ROOT / "docs"
 MEDIA = DOCS / "media"
 SHOWCASE_MEDIA = ROOT / "showcase-media"
