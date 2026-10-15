@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Community Asset Mapper</title>
+  <link rel="stylesheet" href="assets/leaflet.css">
+  <style>
+    :root { --focus: #005fcc; --text: #1a1a1a; --muted: #555; --bg: #fff; --border: #aaa; }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; color: var(--text); background: var(--bg); margin: 0; line-height: 1.5; }
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .skip-link { position: absolute; left: -9999px; top: 0; background: var(--focus); color: #fff; padding: 0.5rem 1rem; z-index: 1000; }
+    .skip-link:focus { left: 0; }
+    header, main, footer { padding: 1rem 1.5rem; }
+    header, footer { border-block: 1px solid var(--border); }
+    nav[aria-label="Filters"] { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; align-items: end; }
+    label { display: flex; flex-direction: column; font-size: 0.9rem; }
+    #map { height: 400px; border: 1px solid var(--border); margin-block: 1rem 1.5rem; background: #e8eef5; }
+    .table-scroll { overflow-x: auto; padding: 4px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid var(--border); padding: 0.5rem; text-align: left; }
+    th { background: #f4f4f4; }
+    button, input, select { font: inherit; }
+    button { min-height: 32px; cursor: pointer; }
+    .badge { display: inline-block; padding: 0.1rem 0.4rem; border: 1px solid var(--border); border-radius: 3px; font-size: 0.85rem; }
+    .badge::before { content: "Type: "; font-weight: bold; }
+    .service-marker { color: #fff; background: #005fcc; border: 2px solid #fff; border-radius: 50%; text-align: center; font: bold 14px/28px system-ui; }
+    #result-count { font-weight: bold; }
+    footer { font-size: 0.85rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#services-table">Skip to services table</a>
+  <header role="banner">
+    <h1>Community Asset Mapper</h1>
+    <p>Community service directory with map and searchable table.</p>
+    <p>Bundled demo records are illustrative and unverified. Confirm services with the provider before use.</p>
+  </header>
+  <main role="main">
+    <nav aria-label="Filters">
+      <label for="filter-city">City
+        <input type="search" id="filter-city" aria-controls="services-table map" placeholder="Filter by city">
+      </label>
+      <label for="filter-type">Service type
+        <select id="filter-type" aria-controls="services-table map">
+          <option value="">All types</option>
+        </select>
+      </label>
+      <p id="result-count" aria-live="polite" role="status">Showing all services</p>
+      <a href="services.csv" download>Download CSV</a>
+    </nav>
+    <section aria-labelledby="map-heading">
+      <h2 id="map-heading">Service map</h2>
+      <p id="map-help">Focus the map and use arrow keys to pan, plus or minus to zoom.
+        Tab to a service marker and press Enter or Space to open its details. Escape closes details.</p>
+      <a href="#services-table">Continue to services table</a>
+      <p>Map tiles disabled. Service markers remain available offline.</p>
+      <div id="map" class="no-tiles" role="region"
+           tabindex="0" aria-label="Map of community services" aria-describedby="map-help"></div>
+    </section>
+    <section aria-labelledby="directory-heading">
+      <h2 id="directory-heading">Service directory</h2>
+      <p id="table-scroll-help">On a narrow screen, focus the table scroll area and use Left or Right to scroll.</p>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Service table scroll area" aria-describedby="table-scroll-help">
+      <table id="services-table" tabindex="-1">
+        <caption>List of community services with organization, city, type, and map action</caption>
+        <thead><tr>
+          <th scope="col">Service</th><th scope="col">Organization</th>
+          <th scope="col">City</th><th scope="col">Type</th><th scope="col">Map</th>
+        </tr></thead>
+        <tbody>
+          
+          <tr data-city="Vancouver" data-type="hospital">
+            <td>Vancouver General Hospital</td><td>Vancouver Coastal Health</td><td>Vancouver</td>
+            <td><span class="badge">hospital</span></td>
+            <td>
+              <button type="button" data-feature="0" aria-label="Show Vancouver General Hospital on map">Show on map</button>
+            </td>
+          </tr>
+          
+          <tr data-city="Vancouver" data-type="hospital">
+            <td>St. Paul&#39;s Hospital</td><td>Providence Health Care</td><td>Vancouver</td>
+            <td><span class="badge">hospital</span></td>
+            <td>
+              <button type="button" data-feature="1" aria-label="Show St. Paul&#39;s Hospital on map">Show on map</button>
+            </td>
+          </tr>
+          
+          <tr data-city="New Westminster" data-type="hospital">
+            <td>Royal Columbian Hospital</td><td>Fraser Health</td><td>New Westminster</td>
+            <td><span class="badge">hospital</span></td>
+            <td>
+              <button type="button" data-feature="2" aria-label="Show Royal Columbian Hospital on map">Show on map</button>
+            </td>
+          </tr>
+          
+          <tr data-city="North Vancouver" data-type="hospital">
+            <td>Lions Gate Hospital</td><td>Vancouver Coastal Health</td><td>North Vancouver</td>
+            <td><span class="badge">hospital</span></td>
+            <td>
+              <button type="button" data-feature="3" aria-label="Show Lions Gate Hospital on map">Show on map</button>
+            </td>
+          </tr>
+          
+          <tr data-city="Richmond" data-type="hospital">
+            <td>Richmond Hospital</td><td>Vancouver Coastal Health</td><td>Richmond</td>
+            <td><span class="badge">hospital</span></td>
+            <td>
+              <button type="button" data-feature="4" aria-label="Show Richmond Hospital on map">Show on map</button>
+            </td>
+          </tr>
+          
+          <tr data-city="Victoria" data-type="hospital">
+            <td>Victoria General Hospital</td><td>Island Health</td><td>Victoria</td>
+            <td><span class="badge">hospital</span></td>
+            <td>
+              <button type="button" data-feature="5" aria-label="Show Victoria General Hospital on map">Show on map</button>
+            </td>
+          </tr>
+          
+          <tr data-city="Kelowna" data-type="hospital">
+            <td>Kelowna General Hospital</td><td>Interior Health</td><td>Kelowna</td>
+            <td><span class="badge">hospital</span></td>
+            <td>
+              <button type="button" data-feature="6" aria-label="Show Kelowna General Hospital on map">Show on map</button>
+            </td>
+          </tr>
+          
+          <tr data-city="Surrey" data-type="hospital">
+            <td>Surrey Memorial Hospital</td><td>Fraser Health</td><td>Surrey</td>
+            <td><span class="badge">hospital</span></td>
+            <td>
+              <button type="button" data-feature="7" aria-label="Show Surrey Memorial Hospital on map">Show on map</button>
+            </td>
+          </tr>
+          
+          <tr data-city="Burnaby" data-type="hospital">
+            <td>Burnaby Hospital</td><td>Fraser Health</td><td>Burnaby</td>
+            <td><span class="badge">hospital</span></td>
+            <td>
+              <button type="button" data-feature="8" aria-label="Show Burnaby Hospital on map">Show on map</button>
+            </td>
+          </tr>
+          
+          <tr data-city="Abbotsford" data-type="hospital">
+            <td>Abbotsford Regional Hospital</td><td>Fraser Health</td><td>Abbotsford</td>
+            <td><span class="badge">hospital</span></td>
+            <td>
+              <button type="button" data-feature="9" aria-label="Show Abbotsford Regional Hospital on map">Show on map</button>
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
+      </div>
+    </section>
+  </main>
+  <footer role="contentinfo">
+    <p>Contains information licensed under the Open Government Licence – British Columbia.
+      <a href="data-licences.md">Data sources and licences</a></p>
+    <p>Map library: Leaflet. <a href="assets/LEAFLET_LICENSE.txt">Library licence</a>.</p>
+    
+  </footer>
+  <script src="assets/leaflet.min.js"></script>
+  <script>
+    const features = [{"row_index": 0, "name": "Vancouver General Hospital", "organization": "Vancouver Coastal Health", "city": "Vancouver", "service_type": "hospital", "lat": 49.2612, "lon": -123.1207}, {"row_index": 1, "name": "St. Paul's Hospital", "organization": "Providence Health Care", "city": "Vancouver", "service_type": "hospital", "lat": 49.2776, "lon": -123.1294}, {"row_index": 2, "name": "Royal Columbian Hospital", "organization": "Fraser Health", "city": "New Westminster", "service_type": "hospital", "lat": 49.2058, "lon": -122.913}, {"row_index": 3, "name": "Lions Gate Hospital", "organization": "Vancouver Coastal Health", "city": "North Vancouver", "service_type": "hospital", "lat": 49.3235, "lon": -123.072}, {"row_index": 4, "name": "Richmond Hospital", "organization": "Vancouver Coastal Health", "city": "Richmond", "service_type": "hospital", "lat": 49.168, "lon": -123.146}, {"row_index": 5, "name": "Victoria General Hospital", "organization": "Island Health", "city": "Victoria", "service_type": "hospital", "lat": 48.4672, "lon": -123.434}, {"row_index": 6, "name": "Kelowna General Hospital", "organization": "Interior Health", "city": "Kelowna", "service_type": "hospital", "lat": 49.8777, "lon": -119.496}, {"row_index": 7, "name": "Surrey Memorial Hospital", "organization": "Fraser Health", "city": "Surrey", "service_type": "hospital", "lat": 49.175, "lon": -122.849}, {"row_index": 8, "name": "Burnaby Hospital", "organization": "Fraser Health", "city": "Burnaby", "service_type": "hospital", "lat": 49.2485, "lon": -122.962}, {"row_index": 9, "name": "Abbotsford Regional Hospital", "organization": "Fraser Health", "city": "Abbotsford", "service_type": "hospital", "lat": 49.0405, "lon": -122.289}];
+    const noTiles = true;
+    const cityFilter = document.getElementById('filter-city');
+    const typeFilter = document.getElementById('filter-type');
+    const rows = Array.from(document.querySelectorAll('#services-table tbody tr'));
+    let map = null;
+    let markerLayer = null;
+    const markers = new Map();
+    let popupReturnFocus = null;
+    if (typeof L !== 'undefined') {
+      map = L.map('map', {keyboard: true, zoomAnimation: false, fadeAnimation: false});
+      if (!noTiles) {
+        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {attribution: "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors"}).addTo(map);
+      }
+      markerLayer = L.layerGroup().addTo(map);
+      features.forEach(f => {
+        const marker = L.marker([f.lat, f.lon], {
+          keyboard: true, title: f.name, alt: f.name,
+          icon: L.divIcon({className: 'service-marker', html: String(f.row_index + 1), iconSize: [32, 32]})
+        });
+        const content = document.createElement('div');
+        [f.name, f.organization, f.city].forEach(text => {
+          const line = document.createElement('p');
+          line.textContent = text;
+          content.appendChild(line);
+        });
+        marker.bindPopup(content);
+        marker.on('add', () => {
+          const element = marker.getElement();
+          element.setAttribute('aria-label', f.name);
+          element.addEventListener('focus', () => marker.setZIndexOffset(1000));
+          element.addEventListener('blur', () => marker.setZIndexOffset(0));
+          element.addEventListener('keydown', event => {
+            if (event.key === ' ' || event.key === 'Enter') {
+              event.preventDefault();
+              marker.openPopup();
+            }
+          });
+        });
+        marker.addTo(markerLayer);
+        markers.set(f.row_index, marker);
+      });
+      if (features.length) map.fitBounds(features.map(f => [f.lat, f.lon]), {padding: [30, 30], maxZoom: 13});
+      else map.setView([49.25, -123.12], 10);
+      map.on('popupopen', event => {
+        popupReturnFocus = document.activeElement;
+        const close = event.popup.getElement().querySelector('.leaflet-popup-close-button');
+        if (close) close.focus();
+      });
+      map.on('popupclose', () => {
+        const focused = document.activeElement;
+        if (popupReturnFocus && popupReturnFocus.isConnected &&
+            (focused === document.body || focused.classList.contains('leaflet-popup-close-button'))) {
+          popupReturnFocus.focus();
+        }
+      });
+      document.getElementById('map').addEventListener('keydown', event => {
+        if (event.key === 'Escape') map.closePopup();
+      });
+    }
+    const types = [...new Set(rows.map(r => r.dataset.type).filter(Boolean))].sort();
+    types.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t; opt.textContent = t; typeFilter.appendChild(opt);
+    });
+    function applyFilters() {
+      const city = cityFilter.value.toLowerCase();
+      const type = typeFilter.value;
+      let visible = 0;
+      rows.forEach((row, index) => {
+        const show = (!city || row.dataset.city.toLowerCase().includes(city)) && (!type || row.dataset.type === type);
+        row.hidden = !show;
+        if (show) visible++;
+        const marker = markers.get(index);
+        if (marker && markerLayer) {
+          if (show) markerLayer.addLayer(marker);
+          else markerLayer.removeLayer(marker);
+        }
+      });
+      document.getElementById('result-count').textContent = 'Showing ' + visible + ' services';
+    }
+    rows.forEach(row => {
+      const button = row.querySelector('button');
+      if (button) button.addEventListener('click', () => {
+        const marker = markers.get(Number(button.dataset.feature));
+        if (marker && map) {
+          map.panTo(marker.getLatLng(), {animate: false});
+          marker.openPopup();
+        }
+      });
+    });
+    cityFilter.addEventListener('input', applyFilters);
+    typeFilter.addEventListener('change', applyFilters);
+    applyFilters();
+  </script>
+</body>
+</html>
